@@ -3,230 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoClassJoiner — Cloud Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>AutoClassJoiner — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Ambient Background -->
-  <div class="ambient-bg">
-    <div class="ambient-orb orb-1"></div>
-    <div class="ambient-orb orb-2"></div>
-    <div class="ambient-orb orb-3"></div>
-  </div>
-
   <div class="app">
     <!-- Header -->
     <header class="header">
-      <div class="header-left">
-        <div class="logo">
-          <div class="logo-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-              <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/>
-            </svg>
-          </div>
-          <div class="logo-text">
-            <h1>AutoClassJoiner</h1>
-            <span class="badge">CLOUD BOT</span>
-          </div>
-        </div>
+      <div class="logo">
+        <div class="logo-dot"></div>
+        <h1>AutoClassJoiner</h1>
       </div>
-      <div class="header-right">
-        <div class="uptime-chip" id="uptimeChip">
-          <div class="uptime-dot"></div>
-          <span id="uptime">0h 0m</span>
-        </div>
-      </div>
+      <span class="uptime" id="uptime">0h 0m uptime</span>
     </header>
 
-    <!-- Main Status Card -->
-    <div class="hero-status" id="heroStatus">
-      <div class="hero-content">
-        <div class="hero-indicator">
-          <div class="indicator-ring">
-            <div class="indicator-dot" id="statusDot"></div>
-          </div>
-        </div>
-        <div class="hero-info">
-          <h2 id="statusText">Initializing...</h2>
-          <p id="statusSub">Connecting to bot service</p>
-        </div>
+    <!-- Status -->
+    <div class="status-bar" id="statusBar">
+      <div class="status-dot" id="statusDot"></div>
+      <div>
+        <strong id="statusText">Initializing...</strong>
+        <p id="statusSub">Connecting</p>
       </div>
-      <button class="power-btn" id="toggleBtn" title="Toggle Bot">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
-          <line x1="12" y1="2" x2="12" y2="12"/>
-        </svg>
+      <button class="icon-btn" id="toggleBtn" title="Toggle Bot">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
       </button>
     </div>
 
-    <!-- Metrics Row -->
+    <!-- Metrics -->
     <div class="metrics">
-      <div class="metric-card">
-        <div class="metric-icon blue">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-          </svg>
-        </div>
-        <div class="metric-data">
-          <span class="metric-value" id="lastCheck">Never</span>
-          <span class="metric-label">Last Check</span>
-        </div>
+      <div class="metric">
+        <span class="metric-label">Last Check</span>
+        <span class="metric-value" id="lastCheck">Never</span>
       </div>
-      <div class="metric-card">
-        <div class="metric-icon green">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-        </div>
-        <div class="metric-data">
-          <span class="metric-value" id="lastJoined">None yet</span>
-          <span class="metric-label">Last Joined</span>
-        </div>
+      <div class="metric">
+        <span class="metric-label">Last Joined</span>
+        <span class="metric-value" id="lastJoined">None</span>
       </div>
-      <div class="metric-card">
-        <div class="metric-icon orange">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-        </div>
-        <div class="metric-data">
-          <span class="metric-value" id="classCount">0</span>
-          <span class="metric-label">Classes Found</span>
-        </div>
+      <div class="metric">
+        <span class="metric-label">Classes</span>
+        <span class="metric-value" id="classCount">0</span>
       </div>
     </div>
 
-    <!-- Two Column Layout -->
-    <div class="grid-2">
-      <!-- Credentials -->
-      <div class="card glass">
-        <div class="card-header">
-          <div class="card-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-          </div>
-          <h3>Credentials</h3>
-        </div>
-        <p class="card-desc">Your UMS login. Stored in server memory only.</p>
-        <div class="form-stack">
-          <div class="input-float">
-            <input type="text" id="regNumber" placeholder=" " autocomplete="off">
-            <label>Registration Number</label>
-          </div>
-          <div class="input-float">
-            <input type="password" id="password" placeholder=" ">
-            <label>Password</label>
-          </div>
-          <button class="btn btn-gradient" id="saveCredsBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-              <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
-            </svg>
-            Save Credentials
-          </button>
-          <div class="feedback" id="credStatus"></div>
-        </div>
+    <!-- Credentials -->
+    <section class="section">
+      <h2>Credentials</h2>
+      <p class="hint">Your UMS login. Stored in server memory only.</p>
+      <div class="form">
+        <input type="text" id="regNumber" placeholder="Registration Number" autocomplete="off">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn-primary" id="saveCredsBtn">Save</button>
       </div>
+      <div class="feedback" id="credStatus"></div>
+    </section>
 
-      <!-- Quick Actions -->
-      <div class="card glass">
-        <div class="card-header">
-          <div class="card-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-          </div>
-          <h3>Quick Actions</h3>
-        </div>
-        <p class="card-desc">Manually trigger actions or view your schedule.</p>
-        <div class="action-stack">
-          <button class="btn btn-action" id="checkNowBtn">
-            <div class="btn-icon-wrap">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-              </svg>
-            </div>
-            <div class="btn-text">
-              <span class="btn-title">Check Now</span>
-              <span class="btn-sub">Scan for active classes</span>
-            </div>
-            <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-          <button class="btn btn-action" id="viewScheduleBtn">
-            <div class="btn-icon-wrap">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-            </div>
-            <div class="btn-text">
-              <span class="btn-title">View Schedule</span>
-              <span class="btn-sub">Today's class timetable</span>
-            </div>
-            <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
+    <!-- Actions -->
+    <section class="section">
+      <h2>Actions</h2>
+      <div class="btn-row">
+        <button class="btn-outline" id="checkNowBtn">↻ Check Now</button>
+        <button class="btn-outline" id="viewScheduleBtn">📅 View Schedule</button>
       </div>
-    </div>
+    </section>
 
-    <!-- Schedule (hidden by default) -->
-    <div class="card glass" id="scheduleCard" style="display:none;">
-      <div class="card-header">
-        <div class="card-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-        </div>
-        <h3>Today's Classes</h3>
-      </div>
-      <div class="timetable" id="timetable"></div>
-    </div>
+    <!-- Schedule -->
+    <section class="section" id="scheduleCard" style="display:none;">
+      <h2>Today's Classes</h2>
+      <div id="timetable"></div>
+    </section>
 
-    <!-- Activity Log -->
-    <div class="card glass">
-      <div class="card-header">
-        <div class="card-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
-        </div>
-        <h3>Activity Log</h3>
-      </div>
+    <!-- Logs -->
+    <section class="section">
+      <h2>Activity Log</h2>
       <div class="logs" id="logs">
         <div class="log-empty">Waiting for activity...</div>
       </div>
-    </div>
+    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>AutoClassJoiner · Secured with local storage · Built for LPU</p>
-    </footer>
+    <footer>Credentials stored locally · Never leaves your server</footer>
   </div>
 
   <script>
     const API = '';
-
-    const statusDot = document.getElementById('statusDot');
-    const statusText = document.getElementById('statusText');
-    const statusSub = document.getElementById('statusSub');
-    const heroStatus = document.getElementById('heroStatus');
-    const toggleBtn = document.getElementById('toggleBtn');
-    const lastCheckEl = document.getElementById('lastCheck');
-    const lastJoinedEl = document.getElementById('lastJoined');
-    const classCountEl = document.getElementById('classCount');
-    const uptimeEl = document.getElementById('uptime');
-    const uptimeChip = document.getElementById('uptimeChip');
-    const regNumberInput = document.getElementById('regNumber');
-    const passwordInput = document.getElementById('password');
-    const saveCredsBtn = document.getElementById('saveCredsBtn');
-    const credStatus = document.getElementById('credStatus');
-    const checkNowBtn = document.getElementById('checkNowBtn');
-    const viewScheduleBtn = document.getElementById('viewScheduleBtn');
-    const scheduleCard = document.getElementById('scheduleCard');
-    const timetableEl = document.getElementById('timetable');
-    const logsEl = document.getElementById('logs');
+    const $ = id => document.getElementById(id);
 
     setInterval(fetchStatus, 5000);
     fetchStatus();
@@ -234,175 +94,97 @@
     async function fetchStatus() {
       try {
         const res = await fetch(`${API}/api/status`);
-        const data = await res.json();
-        updateUI(data);
-      } catch (e) {
-        statusText.textContent = 'Disconnected';
-        statusSub.textContent = 'Cannot reach bot server';
-        statusDot.className = 'indicator-dot error';
-        heroStatus.className = 'hero-status state-error';
+        updateUI(await res.json());
+      } catch {
+        $('statusText').textContent = 'Disconnected';
+        $('statusDot').className = 'status-dot error';
       }
     }
 
-    function updateUI(data) {
-      statusDot.className = 'indicator-dot';
-      heroStatus.className = 'hero-status';
+    function updateUI(d) {
+      const dot = $('statusDot');
+      const bar = $('statusBar');
+      dot.className = 'status-dot';
+      bar.className = 'status-bar';
 
-      if (!data.botEnabled) {
-        statusDot.classList.add('paused');
-        heroStatus.classList.add('state-paused');
-        statusText.textContent = 'Bot Paused';
-        statusSub.textContent = 'Click the power button to resume monitoring';
-        toggleBtn.classList.add('off');
-      } else if (data.status === 'joined') {
-        statusDot.classList.add('active');
-        heroStatus.classList.add('state-active');
-        statusText.textContent = '🎓 Class Joined!';
-        statusSub.textContent = data.lastJoined ? `Joined: ${data.lastJoined.name}` : 'Successfully joined';
-        toggleBtn.classList.remove('off');
-      } else if (data.status === 'checking' || data.status === 'logging_in') {
-        statusDot.classList.add('checking');
-        heroStatus.classList.add('state-checking');
-        statusText.textContent = 'Scanning...';
-        statusSub.textContent = data.status === 'logging_in' ? 'Logging into MyClass' : 'Looking for active classes';
-        toggleBtn.classList.remove('off');
-      } else if (['logged_in', 'waiting', 'no_active_class', 'no_classes'].includes(data.status)) {
-        statusDot.classList.add('active');
-        heroStatus.classList.add('state-active');
-        statusText.textContent = 'Monitoring Active';
-        statusSub.textContent = 'Watching for the next class to start';
-        toggleBtn.classList.remove('off');
-      } else if (data.status === 'login_failed' || data.status === 'error') {
-        statusDot.classList.add('error');
-        heroStatus.classList.add('state-error');
-        statusText.textContent = 'Error Detected';
-        statusSub.textContent = data.status === 'login_failed' ? 'Invalid credentials — please update' : 'Something went wrong — check logs';
-        toggleBtn.classList.remove('off');
+      if (!d.botEnabled) {
+        dot.classList.add('paused'); bar.classList.add('paused');
+        $('statusText').textContent = 'Paused';
+        $('statusSub').textContent = 'Bot is disabled';
+      } else if (d.status === 'joined') {
+        dot.classList.add('active'); bar.classList.add('active');
+        $('statusText').textContent = 'Class Joined';
+        $('statusSub').textContent = d.lastJoined?.name || 'Joined successfully';
+      } else if (d.status === 'checking' || d.status === 'logging_in') {
+        dot.classList.add('checking');
+        $('statusText').textContent = 'Checking...';
+        $('statusSub').textContent = 'Scanning for classes';
+      } else if (['logged_in','waiting','no_active_class','no_classes'].includes(d.status)) {
+        dot.classList.add('active'); bar.classList.add('active');
+        $('statusText').textContent = 'Monitoring';
+        $('statusSub').textContent = 'Waiting for next class';
+      } else if (d.status === 'login_failed' || d.status === 'error') {
+        dot.classList.add('error'); bar.classList.add('error');
+        $('statusText').textContent = 'Error';
+        $('statusSub').textContent = d.status === 'login_failed' ? 'Invalid credentials' : 'Check logs';
       } else {
-        heroStatus.classList.add(data.hasCredentials ? 'state-idle' : 'state-empty');
-        statusText.textContent = data.hasCredentials ? 'Ready' : 'Setup Required';
-        statusSub.textContent = data.hasCredentials ? 'Cron scheduler is active' : 'Enter your credentials below to begin';
-        toggleBtn.classList.remove('off');
+        $('statusText').textContent = d.hasCredentials ? 'Ready' : 'Setup Required';
+        $('statusSub').textContent = d.hasCredentials ? 'Scheduler active' : 'Enter credentials below';
       }
 
-      lastCheckEl.textContent = data.lastCheck || 'Never';
-      lastJoinedEl.textContent = data.lastJoined ? data.lastJoined.name : 'None yet';
-      classCountEl.textContent = data.timetable ? data.timetable.length : '0';
+      $('lastCheck').textContent = d.lastCheck || 'Never';
+      $('lastJoined').textContent = d.lastJoined?.name || 'None';
+      $('classCount').textContent = d.timetable?.length || '0';
 
-      const hrs = Math.floor(data.uptime / 3600);
-      const mins = Math.floor((data.uptime % 3600) / 60);
-      uptimeEl.textContent = `${hrs}h ${mins}m`;
+      const h = Math.floor(d.uptime/3600), m = Math.floor((d.uptime%3600)/60);
+      $('uptime').textContent = `${h}h ${m}m uptime`;
 
-      if (data.hasCredentials) {
-        credStatus.textContent = `Authenticated as ${data.regNumber}`;
-        credStatus.className = 'feedback success';
+      if (d.hasCredentials) {
+        $('credStatus').textContent = `✓ Logged in as ${d.regNumber}`;
+        $('credStatus').className = 'feedback success';
       }
 
-      if (data.logs && data.logs.length > 0) {
-        logsEl.innerHTML = data.logs.slice().reverse().map(log =>
-          `<div class="log-row ${log.level}">
-            <span class="log-ts">${log.timestamp}</span>
-            <span class="log-badge ${log.level}">${log.level}</span>
-            <span class="log-message">${log.message}</span>
-          </div>`
+      if (d.logs?.length) {
+        $('logs').innerHTML = d.logs.slice().reverse().map(l =>
+          `<div class="log ${l.level}"><span class="log-time">${l.timestamp}</span><span class="log-msg">${l.message}</span></div>`
         ).join('');
       }
     }
 
-    toggleBtn.addEventListener('click', async () => {
-      toggleBtn.classList.add('spin');
-      try {
-        await fetch(`${API}/api/toggle`, { method: 'POST' });
-        await fetchStatus();
-      } catch (e) { console.error(e); }
-      setTimeout(() => toggleBtn.classList.remove('spin'), 600);
-    });
+    $('toggleBtn').onclick = async () => {
+      await fetch(`${API}/api/toggle`, {method:'POST'});
+      fetchStatus();
+    };
 
-    saveCredsBtn.addEventListener('click', async () => {
-      const regNumber = regNumberInput.value.trim();
-      const password = passwordInput.value.trim();
-      if (!regNumber || !password) {
-        credStatus.textContent = 'Both fields are required';
-        credStatus.className = 'feedback error';
-        return;
-      }
-      saveCredsBtn.disabled = true;
-      try {
-        const res = await fetch(`${API}/api/credentials`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ regNumber, password })
-        });
-        const data = await res.json();
-        if (data.success) {
-          credStatus.textContent = '✓ Credentials saved successfully';
-          credStatus.className = 'feedback success';
-          passwordInput.value = '';
-          fetchStatus();
-        } else {
-          credStatus.textContent = data.error;
-          credStatus.className = 'feedback error';
-        }
-      } catch (e) {
-        credStatus.textContent = 'Network error';
-        credStatus.className = 'feedback error';
-      }
-      saveCredsBtn.disabled = false;
-    });
+    $('saveCredsBtn').onclick = async () => {
+      const r = $('regNumber').value.trim(), p = $('password').value.trim();
+      if (!r || !p) { $('credStatus').textContent = 'Both fields required'; $('credStatus').className = 'feedback error'; return; }
+      const res = await fetch(`${API}/api/credentials`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({regNumber:r,password:p})});
+      const d = await res.json();
+      $('credStatus').textContent = d.success ? '✓ Saved' : d.error;
+      $('credStatus').className = `feedback ${d.success ? 'success' : 'error'}`;
+      if (d.success) { $('password').value = ''; fetchStatus(); }
+    };
 
-    checkNowBtn.addEventListener('click', async () => {
-      const titleEl = checkNowBtn.querySelector('.btn-title');
-      const subEl = checkNowBtn.querySelector('.btn-sub');
-      checkNowBtn.disabled = true;
-      titleEl.textContent = 'Checking...';
-      subEl.textContent = 'Please wait';
+    $('checkNowBtn').onclick = async () => {
+      $('checkNowBtn').disabled = true;
+      $('checkNowBtn').textContent = 'Checking...';
       try {
-        const res = await fetch(`${API}/api/trigger`, { method: 'POST' });
-        const data = await res.json();
-        if (data.joined) {
-          titleEl.textContent = `Joined: ${data.className}`;
-          subEl.textContent = 'Successfully auto-joined!';
-        } else if (data.error) {
-          titleEl.textContent = 'Failed';
-          subEl.textContent = data.error;
-        } else {
-          titleEl.textContent = 'No Active Class';
-          subEl.textContent = 'Will check again on schedule';
-        }
-      } catch (e) {
-        titleEl.textContent = 'Error';
-        subEl.textContent = 'Could not reach server';
-      }
-      setTimeout(() => {
-        checkNowBtn.disabled = false;
-        titleEl.textContent = 'Check Now';
-        subEl.textContent = 'Scan for active classes';
-        fetchStatus();
-      }, 4000);
-    });
+        const res = await fetch(`${API}/api/trigger`, {method:'POST'});
+        const d = await res.json();
+        $('checkNowBtn').textContent = d.joined ? `✓ Joined: ${d.className}` : d.error ? `✗ ${d.error}` : 'No active class';
+      } catch { $('checkNowBtn').textContent = '✗ Error'; }
+      setTimeout(() => { $('checkNowBtn').disabled = false; $('checkNowBtn').textContent = '↻ Check Now'; fetchStatus(); }, 3000);
+    };
 
-    viewScheduleBtn.addEventListener('click', async () => {
-      try {
-        const res = await fetch(`${API}/api/schedule`);
-        const data = await res.json();
-        scheduleCard.style.display = 'block';
-        if (data.timetable && data.timetable.length > 0) {
-          timetableEl.innerHTML = data.timetable.map(cls =>
-            `<div class="class-item ${cls.status}">
-              <div class="class-dot ${cls.status}"></div>
-              <div class="class-details">
-                <span class="class-name">${cls.name}</span>
-                <span class="class-time">${cls.time || 'Time not available'}</span>
-              </div>
-              <span class="class-tag ${cls.status}">${cls.status}</span>
-            </div>`
-          ).join('');
-        } else {
-          timetableEl.innerHTML = '<p class="empty-state">No classes found. Click "Check Now" to scan.</p>';
-        }
-        scheduleCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } catch (e) { console.error(e); }
-    });
+    $('viewScheduleBtn').onclick = async () => {
+      const res = await fetch(`${API}/api/schedule`);
+      const d = await res.json();
+      $('scheduleCard').style.display = 'block';
+      $('timetable').innerHTML = d.timetable?.length
+        ? d.timetable.map(c => `<div class="class-row ${c.status}"><span class="class-dot ${c.status}"></span><div><strong>${c.name}</strong><br><small>${c.time||'No time'}</small></div><span class="tag ${c.status}">${c.status}</span></div>`).join('')
+        : '<p class="log-empty">No classes. Click "Check Now" first.</p>';
+    };
   </script>
 </body>
 </html>
