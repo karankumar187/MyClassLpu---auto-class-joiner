@@ -91,24 +91,12 @@
           <div class="section-header">
             <div class="header-with-status">
               <h2>Live Browser View</h2>
-              <span class="live-badge" id="liveBadge">&#9679; LIVE</span>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-              <button class="btn-small" id="streamToggleBtn">&#9654; Live Stream</button>
-              <button class="btn-small" id="refreshScreenBtn">Refresh</button>
+              <span class="live-badge" id="liveBadge" style="display:inline-flex;">&#9679; LIVE</span>
             </div>
           </div>
-          <p class="url-bar" id="browserUrl">No active session</p>
+          <p class="url-bar" id="browserUrl">Connecting to stream...</p>
           <div class="browser-frame" id="browserFrame">
-            <div class="browser-placeholder" id="browserPlaceholder">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              <span>No browser session active</span>
-              <small>Click "Check Now" to wake bot</small>
-            </div>
-            <!-- Snapshot polling mode -->
-            <img id="browserScreenshot" src="" alt="Live browser snapshot" style="display:none;width:100%;height:auto;border-radius:0 0 10px 10px;">
-            <!-- MJPEG live stream mode -->
-            <img id="browserStream" src="" alt="Live browser stream" style="display:none;width:100%;height:auto;border-radius:0 0 10px 10px;">
+            <img id="browserStream" src="/api/stream" alt="Live browser stream" style="width:100%;height:auto;border-radius:0 0 10px 10px;">
           </div>
         </section>
 
@@ -132,56 +120,11 @@
     const API = '';
     const $ = id => document.getElementById(id);
 
-    // ── View mode: 'stream' or 'snapshot' ──
-    let viewMode = 'snapshot';
+    // Live badge always visible
+    $('liveBadge').style.display = 'inline-flex';
 
     setInterval(fetchStatus, 5000);
     fetchStatus();
-
-    // Snapshot polling every 5 seconds
-    let snapshotTimer = setInterval(fetchScreenshot, 5000);
-
-    // ── Stream toggle ──
-    $('streamToggleBtn').onclick = () => {
-      if (viewMode === 'snapshot') {
-        enableStream();
-      } else {
-        disableStream();
-      }
-    };
-
-    function enableStream() {
-      viewMode = 'stream';
-      // Stop snapshot polling to save resources
-      clearInterval(snapshotTimer);
-
-      // Point the stream img at the MJPEG endpoint
-      $('browserStream').src = `${API}/api/stream`;
-      $('browserStream').style.display = 'block';
-      $('browserScreenshot').style.display = 'none';
-      $('browserPlaceholder').style.display = 'none';
-      $('liveBadge').style.display = 'inline-flex';
-      $('streamToggleBtn').textContent = '&#9646;&#9646; Snapshot Mode';
-      $('streamToggleBtn').innerHTML = '&#9646;&#9646; Snapshot Mode';
-      $('streamToggleBtn').style.background = '#e8f5e9';
-      $('streamToggleBtn').style.borderColor = '#a5d6a7';
-      $('streamToggleBtn').style.color = '#2e7d32';
-    }
-
-    function disableStream() {
-      viewMode = 'snapshot';
-      // Stop the stream by clearing the src
-      $('browserStream').src = '';
-      $('browserStream').style.display = 'none';
-      $('liveBadge').style.display = 'none';
-      $('streamToggleBtn').innerHTML = '&#9654; Live Stream';
-      $('streamToggleBtn').style.background = '';
-      $('streamToggleBtn').style.borderColor = '';
-      $('streamToggleBtn').style.color = '';
-      // Resume snapshot polling
-      snapshotTimer = setInterval(fetchScreenshot, 5000);
-      fetchScreenshot();
-    }
 
     async function fetchStatus() {
       try {
@@ -194,36 +137,6 @@
         $('statusBar').className = 'status-bar error';
       }
     }
-
-    async function fetchScreenshot() {
-      // Skip if stream mode is active
-      if (viewMode === 'stream') return;
-      try {
-        const res = await fetch(`${API}/api/screenshot`);
-        const data = await res.json();
-        if (data.image) {
-          $('browserScreenshot').src = `data:image/webp;base64,${data.image}`;
-          $('browserScreenshot').style.display = 'block';
-          $('browserPlaceholder').style.display = 'none';
-          $('browserUrl').textContent = data.url || 'Unknown page';
-          $('liveBadge').style.display = 'none'; // only show LIVE in stream mode
-        } else {
-          $('browserScreenshot').style.display = 'none';
-          $('browserPlaceholder').style.display = 'flex';
-          $('browserUrl').textContent = 'Session inactive';
-          $('liveBadge').style.display = 'none';
-        }
-      } catch {
-        $('browserScreenshot').style.display = 'none';
-        $('browserPlaceholder').style.display = 'flex';
-        $('liveBadge').style.display = 'none';
-      }
-    }
-
-    $('refreshScreenBtn').onclick = () => {
-      $('refreshScreenBtn').textContent = '...';
-      fetchScreenshot().then(() => $('refreshScreenBtn').textContent = 'Refresh');
-    };
 
     function updateUI(d) {
       const dot = $('statusDot');
@@ -269,6 +182,9 @@
       const h = Math.floor(d.uptime/3600), m = Math.floor((d.uptime%3600)/60);
       $('uptime').textContent = `${h}h ${m}m uptime`;
 
+      // Update URL bar from status
+      if (d.currentUrl) $('browserUrl').textContent = d.currentUrl;
+
       // Account info
       if (d.hasCredentials && d.regNumber) {
         $('userRegNo').textContent = d.regNumber;
@@ -280,15 +196,12 @@
         $('accountStatus').className = 'error-text';
       }
 
-      // Render schedule automatically
+      // Render schedule
       if (d.timetable) {
         $('timetable').innerHTML = d.timetable.length
           ? d.timetable.map(c => `<div class="class-row ${c.status}"><span class="class-dot ${c.status}"></span><div><strong>${c.name}</strong><br><small>${c.time||'No time'}</small></div><span class="tag ${c.status}">${c.status}</span></div>`).join('')
           : '<p class="log-empty">No classes scheduled.</p>';
       }
-
-      // Auto-fetch screenshot if session is available
-      if (d.screenshotAvailable) fetchScreenshot();
 
       // Logs
       if (d.logs?.length) {
@@ -309,11 +222,9 @@
       $('checkNowBtn').innerHTML = 'Checking...';
       try {
         await fetch(`${API}/api/trigger`, {method:'POST'});
-        fetchScreenshot();
       } catch {}
       setTimeout(() => { $('checkNowBtn').disabled = false; $('checkNowBtn').innerHTML = originalText; fetchStatus(); }, 2000);
     };
-
 
     $('clearLogsBtn').onclick = () => {
       $('logs').innerHTML = '<div class="log-empty">Logs cleared.</div>';
