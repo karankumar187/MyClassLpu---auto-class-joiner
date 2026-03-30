@@ -550,48 +550,80 @@ class AutoClassBot {
       this.log(`Navigating to join URL: ${joinUrl}`);
 
       await this.page.goto(joinUrl, { waitUntil: 'networkidle2', timeout: 20000 });
-      await this.delay(2000);
+      await this.delay(3000);
 
       // Check if join was successful
       const pageContent = await this.page.evaluate(() => document.body.innerText);
-
       if (pageContent.includes('Too late') || pageContent.includes('already ended')) {
         this.log('Class has already ended.', 'warn');
         return false;
       }
 
-      // Select "Listen only" on BBB audio modal
-      try {
-        this.log('Waiting for audio selection prompt (Listen only)...');
-        await this.page.waitForFunction(() => {
-          const btns = Array.from(document.querySelectorAll('button'));
-          return btns.some(b => 
-            (b.getAttribute('aria-label') || '').toLowerCase().includes('listen only') ||
-            (b.textContent || '').toLowerCase().includes('listen only')
-          );
-        }, { timeout: 15000 });
+      // Select "Listen only" — retry up to 4 times with 3s gap
+      // BBB may render the modal slowly or inside an iframe
+      this.log('Looking for "Listen Only" audio button...');
+      let listenOnlyClicked = false;
 
-        const clicked = await this.page.evaluate(() => {
-          const btns = Array.from(document.querySelectorAll('button'));
-          const btn = btns.find(b => 
-            (b.getAttribute('aria-label') || '').toLowerCase().includes('listen only') ||
-            (b.textContent || '').toLowerCase().includes('listen only')
-          );
-          if (btn) {
-            btn.click();
-            return true;
-          }
-          return false;
-        });
+      for (let attempt = 1; attempt <= 4 && !listenOnlyClicked; attempt++) {
+        this.log(`Listen Only check — attempt ${attempt}/4`);
 
-        if (clicked) {
-          this.log('Selected "Listen only" audio mode.');
-          await this.delay(1000);
+        // Helper: try clicking in a given frame's document
+        const tryClickInFrame = async (frame) => {
+          try {
+            return await frame.evaluate(() => {
+              // All selectors BBB uses for the "Listen only" button
+              const selectors = [
+                'button[data-test="listenOnlyBtn"]',
+                'button[aria-label="Listen only"]',
+                'button[aria-label="listen only"]',
+                'button[title="Listen only"]',
+              ];
+              for (const sel of selectors) {
+                const el = document.querySelector(sel);
+                if (el) { el.click(); return `selector:${sel}`; }
+              }
+              // Broad text / aria-label scan
+              const btns = Array.from(document.querySelectorAll('button, [role="button"]'));
+              const btn = btns.find(b => {
+                const label = (b.getAttribute('aria-label') || b.getAttribute('title') || b.textContent || '').toLowerCase();
+                return label.includes('listen only') || label.includes('listen-only');
+              });
+              if (btn) { btn.click(); return `text:${btn.textContent.trim().slice(0, 30)}`; }
+              return null;
+            });
+          } catch { return null; }
+        };
+
+        // Try the main frame first
+        const mainResult = await tryClickInFrame(this.page.mainFrame());
+        if (mainResult) {
+          this.log(`✅ Clicked "Listen Only" in main frame (${mainResult}).`);
+          listenOnlyClicked = true;
+          break;
         }
-      } catch (err) {
-        this.log('Audio prompt not found; might be direct join or non-BBB meeting.', 'info');
+
+        // Try all child iframes (BBB loads inside an iframe)
+        for (const frame of this.page.frames()) {
+          if (frame === this.page.mainFrame()) continue;
+          const frameResult = await tryClickInFrame(frame);
+          if (frameResult) {
+            this.log(`✅ Clicked "Listen Only" in iframe (${frameResult}).`);
+            listenOnlyClicked = true;
+            break;
+          }
+        }
+
+        if (!listenOnlyClicked && attempt < 4) {
+          this.log(`Listen Only button not found yet — waiting 3s before retry...`);
+          await this.delay(3000);
+        }
       }
 
+      if (!listenOnlyClicked) {
+        this.log('Audio prompt not detected after 4 attempts; assuming direct join or non-BBB meeting.', 'info');
+      }
+
+      await this.delay(1500);
       this.log(`✅ Successfully joined class: "${classInfo.name}"`);
       return true;
 
