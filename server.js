@@ -109,7 +109,7 @@ app.get('/api/screenshot', async (req, res) => {
 // ── MJPEG Live Stream ──────────────────────────────────────────────────────
 // Streams Puppeteer screenshots as a continuous MJPEG feed (~1.5 fps).
 // The browser uses a plain <img src="/api/stream"> — no JS, no WebSocket.
-const STREAM_FPS_MS = 700; // ms between frames (~1.4 fps)
+const STREAM_FPS_MS = 1000; // ms between frames (~1.0 fps) for stability
 const activeStreamClients = new Set();
 
 app.get('/api/stream', (req, res) => {
@@ -119,6 +119,7 @@ app.get('/api/stream', (req, res) => {
     'Pragma': 'no-cache',
     'Connection': 'keep-alive',
     'Transfer-Encoding': 'chunked',
+    'X-Accel-Buffering': 'no', // Disable Nginx/proxy buffering
   });
 
   let alive = true;
@@ -139,13 +140,10 @@ app.get('/api/stream', (req, res) => {
   const writeFrame = (buffer, mime = 'image/jpeg') => {
     if (!alive || res.destroyed) return false;
     try {
-      res.write(
-        `--mjpegframe\r\n` +
-        `Content-Type: ${mime}\r\n` +
-        `Content-Length: ${buffer.length}\r\n\r\n`
-      );
+      // Use standard MJPEG frame structure with trailing newlines
+      res.write(`--mjpegframe\r\nContent-Type: ${mime}\r\nContent-Length: ${buffer.length}\r\n\r\n`);
       res.write(buffer);
-      res.write('\r\n');
+      res.write('\r\n\r\n');
       return true;
     } catch {
       return false;
