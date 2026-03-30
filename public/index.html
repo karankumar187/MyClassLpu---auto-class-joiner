@@ -261,12 +261,6 @@
       setTimeout(() => { $('checkNowBtn').disabled = false; $('checkNowBtn').innerHTML = originalText; fetchStatus(); }, 2000);
     };
 
-    $('viewScheduleBtn').onclick = async () => {
-      const originalText = $('viewScheduleBtn').innerHTML;
-      $('viewScheduleBtn').innerHTML = 'Refreshing...';
-      await fetchStatus();
-      setTimeout(() => { $('viewScheduleBtn').innerHTML = originalText; }, 1000);
-    };
 
     $('clearLogsBtn').onclick = () => {
       $('logs').innerHTML = '<div class="log-empty">Logs cleared.</div>';
