@@ -92,6 +92,7 @@
             <div class="header-with-status">
               <h2>Live Browser View</h2>
             </div>
+            <button class="btn-small" id="refreshBrowserBtn">Refresh</button>
           </div>
           <p class="url-bar" id="browserUrl">Initializing view...</p>
           <div class="browser-frame" id="browserFrame">
@@ -127,8 +128,18 @@
     fetchStatus();
 
     // Auto-refresh screenshot every 2 seconds as requested
-    setInterval(fetchScreenshot, 2000);
+    let screenshotInterval = setInterval(fetchScreenshot, 2000);
     fetchScreenshot();
+
+    $('refreshBrowserBtn').onclick = async () => {
+      const btn = $('refreshBrowserBtn');
+      const original = btn.textContent;
+      btn.textContent = '...';
+      btn.disabled = true;
+      await fetchScreenshot();
+      btn.textContent = original;
+      btn.disabled = false;
+    };
 
     async function fetchStatus() {
       try {
@@ -219,8 +230,8 @@
       try {
         const res = await fetch(`${API}/api/screenshot`);
         const data = await res.json();
-        if (data.image) {
-          $('browserScreenshot').src = `data:image/webp;base64,${data.image}`;
+        if (data && data.image) {
+          $('browserScreenshot').src = `data:image/jpeg;base64,${data.image}`;
           $('browserScreenshot').style.display = 'block';
           if ($('browserPlaceholder')) $('browserPlaceholder').style.display = 'none';
           if (data.url) $('browserUrl').textContent = data.url;
