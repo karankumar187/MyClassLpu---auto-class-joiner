@@ -20,6 +20,15 @@ Automatically login and join classes on **myclass.lpu.in** (CodeTantra). Runs 24
    - `PASSWORD` = your UMS password
 6. Deploy 🚀
 
+## Ensuring 24/7 Stability (Render Free Tier)
+Render's free tier spins down the server after 15 minutes of inactivity. To keep the bot active and prevent "Web server is down" errors:
+1. Create a free account on [UptimeRobot](https://uptimerobot.com/).
+2. Add a new **HTTP(s) Monitor**.
+3. Set the URL to: `https://your-service-name.onrender.com/ping`
+4. Set the monitoring interval to **5 minutes**.
+
+This keeps the instance warm and ensures classes are joined exactly on time.
+
 ## Local Testing
 ```bash
 npm install
